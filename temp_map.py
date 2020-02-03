@@ -13,7 +13,8 @@ import cartopy.feature as cfeature
 import numpy as np
 import datetime
 import meteo_functions
-
+from cartopy.feature import ShapelyFeature
+from cartopy.io.shapereader import Reader
 
 my_dpi = 200
 
@@ -67,8 +68,15 @@ class Temp_map:
         fig, ax = plt.subplots(subplot_kw={'projection': ccrs.PlateCarree()}, constrained_layout=True)
         CS = plt.contourf(self.LON, self.LAT, self.field, self.num_levels,  cmap=self.colormap,
              transform=ccrs.PlateCarree())
-        coastlines_50m = cfeature.NaturalEarthFeature('physical', 'coastline', '10m')
-        ax.add_feature(coastlines_50m, facecolor='None', edgecolor='black')
+        coastname = './Shapefiles/Costa.shp'
+        #coastlines_10m = cfeature.NaturalEarthFeature('physical', 'coastline', '10m')
+        coastlines_10m = ShapelyFeature(Reader(coastname).geometries(), ccrs.epsg(25831),
+                               linewidth = 1, facecolor = 'None', edgecolor='black')
+        ax.add_feature(coastlines_10m, facecolor='None', edgecolor='black')
+        filename = './Shapefiles/AMB31N.shp'
+        AMB_feature = ShapelyFeature(Reader(filename).geometries(), ccrs.epsg(25831),
+                               linewidth = 1, facecolor = 'None', edgecolor='black')
+        ax.add_feature(AMB_feature)
         cbar = fig.colorbar(CS)
         cbar.ax.set_ylabel(variable_label, size = 12)
         plt.savefig(pathout+variable+"_"+model_label+"_map.png")
